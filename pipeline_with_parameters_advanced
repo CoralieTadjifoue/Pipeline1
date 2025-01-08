@@ -1,50 +1,66 @@
 pipeline {
-agent any
-parameters {
-string(name: 'NAME', description: 'Please tell me your name')
-text(name: 'DESC', description: 'Tell me about the job details')
-booleanParam(name: 'SKIP_TEST', defaultValue: true, description: 'Want to skip running Test cases?')
-choice(name: 'BRANCH', choices: ['main', 'dev'], description: 'Choose Branch')
-password(name: 'SONAR_SERVER_PWD', description: 'Enter SONAR password')
-}
-stages {
-    stage('Printing name') {
-        steps {
-            script {
-                def name = "${params.NAME}"
-                def desc = "${params.DESC}"
-                def skip_test = "${param.SKIP_TEST}"
-                def branch = "{param.BRANCH}"
-                def psswd = "{param.SONAR_SERVER_PWD}"
+    agent any
+    parameters {
+        string(name: 'NAME', description: 'Please tell me your name')
+        text(name: 'DESC', description: 'Tell me about the job details')
+        booleanParam(name: 'SKIP_TEST', defaultValue: true, description: 'Want to skip running Test cases?')
+        choice(name: 'BRANCH', choices: ['main', 'dev'], description: 'Choose Branch')
+        password(name: 'SONAR_SERVER_PWD', description: 'Enter SONAR password')
+    }
+    stages {
+        stage('Printing name') {
+            steps {
+                script {
+                    def name = "${params.NAME}"
+                    def desc = "${params.DESC}"
+                    def skip_test = params.SKIP_TEST // Removed quotes for boolean
+                    def branch = "${params.BRANCH}"
+                    def psswd = "${params.SONAR_SERVER_PWD}"
+
+                    echo "Name: ${name}"
+                    echo "Description: ${desc}"
+                    echo "Skip Tests: ${skip_test}"
+                    echo "Branch: ${branch}"
+                    // Passwords should not be echoed for security reasons.
+                }
             }
         }
-    }
-   
-    stage('BUILD') {
+        stage('BUILD') {
             steps {
-                echo 'Developpement in ${branch}'
+                script {
+                    echo "Development in ${params.BRANCH}"
+                }
             }
         }
         stage('Test') {
             steps {
-              execute_stage('Test', params.skip_test) {
-                      sh 'echo "Running tests"'
-                  echo 'Testing'\
+                script {
+                    execute_stage('Test', params.SKIP_TEST) {
+                        echo 'Running tests'
+                        sh 'echo "Testing..."'
+                    }
                 }
             }
         }
         stage('DEPLOY') {
             steps {
-                echo 'Mise en Production'
+                echo 'Deploying to Production'
             }
         }
     }
-    
-    def execute_stage(stage_name, skip, Closure steps) {
+
+    // Helper method for conditional stage execution
+    post {
+        always {
+            echo "Pipeline execution completed."
+        }
+    }
+}
+
+def execute_stage(stage_name, skip, Closure steps) {
     if (skip) {
         echo "Skipping ${stage_name} stage"
     } else {
         steps.call()
-        }
     }
 }
