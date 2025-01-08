@@ -13,7 +13,7 @@ pipeline {
                 script {
                     def name = "${params.NAME}"
                     def desc = "${params.DESC}"
-                    def skip_test = params.SKIP_TEST // Removed quotes for boolean
+                    def skip_test = params.SKIP_TEST 
                     def branch = "${params.BRANCH}"
                     def psswd = "${params.SONAR_SERVER_PWD}"
 
@@ -21,7 +21,7 @@ pipeline {
                     echo "Description: ${desc}"
                     echo "Skip Tests: ${skip_test}"
                     echo "Branch: ${branch}"
-                    // Passwords should not be echoed for security reasons.
+                    
                 }
             }
         }
@@ -49,7 +49,7 @@ pipeline {
         }
     }
 
-    // Helper method for conditional stage execution
+    
     post {
         always {
             echo "Pipeline execution completed."
