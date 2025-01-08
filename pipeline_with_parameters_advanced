@@ -29,7 +29,8 @@ stages {
             steps {
               execute_stage('Test', params.skip_test) {
                       sh 'echo "Running tests"'
-                  echo 'Testing'
+                  echo 'Testing'\
+                }
             }
         }
         stage('DEPLOY') {
@@ -45,4 +46,5 @@ stages {
     } else {
         steps.call()
     }
+}
 }
