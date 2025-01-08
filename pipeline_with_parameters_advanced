@@ -45,6 +45,6 @@ stages {
         echo "Skipping ${stage_name} stage"
     } else {
         steps.call()
+        }
     }
-}
 }
